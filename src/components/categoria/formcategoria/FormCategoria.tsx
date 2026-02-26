@@ -2,16 +2,16 @@ import { useNavigate, useParams } from "react-router-dom";
 import type { Categoria } from "../../../models/Categoria";
 import { atualizar, buscar, cadastrar } from "../../../services/Service";
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
+import { ClipLoader } from "react-spinners";
 
 function FormCategoria() {
 
 
     const navigate = useNavigate();
 
-const [tema, setCategoria] = useState<Categoria>({} as Categoria)
+const [categoria, setCategoria] = useState<Categoria>({} as Categoria)
 
 const [isLoading, setIsLoading] = useState<boolean>(false)
-
 
 const { id } = useParams<{ id: string }>();
 
@@ -20,13 +20,17 @@ useEffect(() => {
     if (id !== undefined) {
         buscarPorId(id)
     }
-}, [id])
+}, [id]);
+
+ async function buscarPorId(id: string) {
+        await buscar(`/categorias/${id}`, setCategoria);
+     }
 
 function atualizarEstado(e: ChangeEvent<HTMLInputElement>) {
     setCategoria({
         ...categoria,
         [e.target.name]: e.target.value
-    })
+    });
 }
 
 function retornar() {
@@ -37,33 +41,18 @@ async function gerarNovaCategoria(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setIsLoading(true)
 
-    if (id !== undefined) {
         try {
-            await atualizar(`/temas`, tema, setTema, {
-                headers: { 'Authorization': token }
-            })
-            ToastAlerta('O Tema foi atualizado com sucesso!', "sucesso")
-        } catch (error: any) {
-            if (error.toString().includes('401')) {
-                handleLogout();
+            if (id !== undefined) {
+                await atualizar(`/categorias`, categoria, setCategoria);
+                alert("Categoria atualizada com sucesso!");
             } else {
-                ToastAlerta('Erro ao atualizar o tema.',"erro")
+                await cadastrar(`/categorias`, categoria, setCategoria);
+                alert("Categoria cadastrada com sucesso!");
             }
+        } catch (error) {
+            alert("Erro ao salvar categoria.");
         }
-    } else {
-        try {
-            await cadastrar(`/temas`, tema, setCategoria, {
-                headers: { 'Authorization': token }
-            })
-            ToastAlerta('A Categoria foi cadastrado com sucesso!', "sucesso")
-        } catch (error: any) {
-            if (error.toString().includes('401')) {
-                handleLogout();
-            } else {
-                ToastAlerta('Erro ao cadastrar categoria.', "erro")
-            }
-        }
-    }
+
 
     setIsLoading(false)
     retornar()
@@ -84,8 +73,8 @@ async function gerarNovaCategoria(e: FormEvent<HTMLFormElement>) {
                         placeholder="Descreva aqui sua categoria"
                         name='descricao'
                         className="border-2 border-slate-700 rounded p-2"
-                        value={categoria.descricao}
-                        onChange= {(e: ChangeEvent<HTMLInputElement>) => atualizarEstado(e)}
+                        value={categoria.descricao || ""}
+                        onChange= {atualizarEstado}
                     />
                 </div>
                 <button
@@ -104,10 +93,6 @@ async function gerarNovaCategoria(e: FormEvent<HTMLFormElement>) {
             </form>
         </div>
     );
-}
 
+}
 export default FormCategoria;
-
-function ToastAlerta(arg0: string, arg1: string) {
-  throw new Error("Function not implemented.");
-}

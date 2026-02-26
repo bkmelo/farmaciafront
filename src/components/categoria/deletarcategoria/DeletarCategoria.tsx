@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import type { Categoria } from "../../../models/Categoria"
 import { buscar } from "../../../services/Service"
+import { ClipLoader } from "react-spinners"
 
 
 function DeletarCategoria() {

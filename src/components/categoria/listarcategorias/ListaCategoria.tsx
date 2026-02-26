@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { buscar } from "../../../services/Service";
 import CardCategoria from "../cardcategoria/CardCategoria";
 import type { Categoria } from "../../../models/Categoria";
 import { useNavigate } from "react-router-dom";
+import { SyncLoader } from "react-spinners";
 
 
 function ListaCategoria() {
@@ -19,7 +20,7 @@ function ListaCategoria() {
 
         setIsLoading(true)
 
-          await buscar('/categoria', setCategoria)
+          await buscar('/categorias', setCategoria)
       } catch (error: any) {
         console.log(error)
        
@@ -28,7 +29,11 @@ function ListaCategoria() {
       }
 
   }
-
+  
+useEffect(() => {
+    buscarCategoria()
+  }, [])
+  
     return (
         <>
 
@@ -65,4 +70,4 @@ function ListaCategoria() {
     )
 }
 
-export default ListaTemas;
+export default ListaCategoria;
